@@ -20,20 +20,18 @@ function add(a, b) {
   function operate(firstOperand, secondOperand, operator) {
     switch (operator) {
       case 'add':
-        return firstOperand + secondOperand;
+        return add(firstOperand, secondOperand);
       case 'sub':
-        return firstOperand - secondOperand;
+        return sub(firstOperand, secondOperand);
       case 'multiply':
-        return firstOperand * secondOperand;
+        return multiply(firstOperand, secondOperand);
       case 'divide':
-        if (secondOperand === 0) {
-          return 'Error: Cannot divide by 0';
-        }
-        return firstOperand / secondOperand;
+        return divide(firstOperand, secondOperand);
       default:
         return 'Error: Invalid operator';
     }
   }
+
   
 
 
@@ -53,12 +51,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Add click event listeners to each button
   buttons.forEach(button => {
     button.addEventListener('click', handleButtonClick);
-  })});
+  });
+});
 
   // Function to handle button click events
   function handleButtonClick(e) {
     const value = e.target.innerText;
-  
+
     if (value === 'C') {
       calculator.displayValue = '0';
       calculator.firstOperand = null;
@@ -82,15 +81,22 @@ document.addEventListener('DOMContentLoaded', function() {
           calculator.displayValue = result;
           calculator.firstOperand = result;
           calculator.waitingForSecondOperand = false;
-          calculator.operator = null;
+          calculator.operator = operatorMap[value];
         }
-      }      
-      calculator.operator = operatorMap[value];
-      calculator.waitingForSecondOperand = true;
+      } else {
+        calculator.firstOperand = parseFloat(calculator.displayValue);
+        calculator.waitingForSecondOperand = true;
+        calculator.operator = operatorMap[value];
+      }
     } else if (value === '=') {
       if (calculator.firstOperand !== null && calculator.operator !== null) {
         const result = operate(calculator.firstOperand, parseFloat(calculator.displayValue), calculator.operator);
-        calculator.displayValue = result;
+        if (typeof result === 'string') {
+          calculator.displayValue = result;
+        } else {
+          calculator.displayValue = result;
+        }
+
         calculator.firstOperand = null;
         calculator.waitingForSecondOperand = false;
         calculator.operator = null;
@@ -103,7 +109,6 @@ document.addEventListener('DOMContentLoaded', function() {
         calculator.displayValue += value;
       }
     }
-  
+
     display.value = calculator.displayValue;
   }
-  
